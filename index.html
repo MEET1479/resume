@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Resume Builder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #eef2f7;
+      color: #0f172a;
+      margin: 0;
+      padding: 20px;
+      transition: 0.3s;
+    }
+    body.dark { background: #0f172a; color: #f1f5f9; }
+    h1 {
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      color: #0ea5e9;
+      letter-spacing: 2px;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 25px;
+      max-width: 1200px;
+      margin: 30px auto;
+    }
+    .card {
+      background: rgba(255,255,255,0.9);
+      border-radius: 18px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      padding: 25px;
+      flex: 1 1 450px;
+      transition: 0.3s;
+    }
+    body.dark .card { background: rgba(30,41,59,0.9); }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 600;
+      color: #2563eb;
+    }
+    input, textarea {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      font-size: 14px;
+      color: #0f172a;
+      transition: 0.3s;
+    }
+    body.dark input, body.dark textarea {
+      background: #1e293b;
+      color: #f1f5f9;
+      border-color: #475569;
+    }
+    input:focus, textarea:focus {
+      border-color: #0ea5e9;
+      box-shadow: 0 0 5px rgba(14,165,233,0.3);
+      outline: none;
+    }
+    textarea { resize: vertical; min-height: 70px; }
+    button {
+      margin-top: 15px;
+      padding: 12px 22px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      background: linear-gradient(135deg,#0ea5e9,#38bdf8);
+      color: white;
+      transition: all 0.3s ease;
+    }
+    button:hover {
+      background: linear-gradient(135deg,#0284c7,#0ea5e9);
+      transform: translateY(-2px);
+    }
+    #preview {
+      background: white;
+      border-radius: 18px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+      padding: 25px;
+      color: #0f172a;
+      font-size: 15px;
+      width: 800px;
+      margin: auto;
+    }
+    #preview h1 { 
+      color: #0ea5e9; 
+      margin: 0; 
+      font-size: 22px; /* name smaller */
+    }
+    #preview h3 { color: #1e293b; margin-bottom: 6px; }
+    #preview hr { border: none; border-top: 2px solid #cbd5e1; margin: 10px 0; }
+    #preview img {
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border: 3px solid #0ea5e9;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .section { margin-bottom: 10px; }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<h1>Resume Builder</h1>
+<button id="toggleDark">🌙 Dark Mode</button>
+
+<div class="container">
+  <div class="card">
+    <h2>🧾 Fill Your Details</h2>
+    <label>Photo</label>
+    <input type="file" id="photo" accept="image/*">
+
+    <label>Name</label>
+    <input type="text" id="name" placeholder="Your Full Name" oninput="saveToLocal()">
+
+    <label>Phone Number</label>
+    <input type="text" id="phone" placeholder="+91 98765 43210" oninput="saveToLocal()">
+
+    <label>Address</label>
+    <input type="text" id="address" placeholder="Your Address" oninput="saveToLocal()">
+
+    <label>Email</label>
+    <input type="email" id="email" placeholder="email@example.com" oninput="saveToLocal()">
+
+    <label>Summary</label>
+    <textarea id="summary" placeholder="Short professional summary" oninput="saveToLocal()"></textarea>
+
+    <label>Technical Skills</label>
+    <textarea id="skills" placeholder="e.g., HTML, CSS, Python, JavaScript" oninput="saveToLocal()"></textarea>
+
+    <label>Work Experience - Current</label>
+    <textarea id="workCurrent" placeholder="Your current job details" oninput="saveToLocal()"></textarea>
+
+    <label>Work Experience - Previous</label>
+    <textarea id="workPrev" placeholder="Your previous job details" oninput="saveToLocal()"></textarea>
+
+    <label>Education</label>
+    <textarea id="education" placeholder="Your education details" oninput="saveToLocal()"></textarea>
+
+    <label>Soft Skills</label>
+    <textarea id="softSkills" placeholder="Leadership, Communication, Teamwork" oninput="saveToLocal()"></textarea>
+
+    <label>Hobbies</label>
+    <textarea id="hobby" placeholder="Your hobbies" oninput="saveToLocal()"></textarea>
+
+    <button onclick="updatePreview()">💡 Preview</button>
+    <button onclick="downloadPDF()">⬇️ Download PDF</button>
+  </div>
+
+  <div class="card">
+    <h2>📄 Live Preview</h2>
+    <div id="preview">
+      <div class="header">
+        <img id="pv-photo" src="" alt="Photo" style="display:none;">
+        <div>
+          <h1 id="pv-name">Your Name</h1>
+          <p id="pv-contact" style="margin:0;color:#475569;"></p>
+        </div>
+      </div>
+      <hr>
+      <div class="section"><h3>Summary</h3><p id="pv-summary"></p></div>
+      <div class="section"><h3>Technical Skills</h3><p id="pv-skills"></p></div>
+      <div class="section"><h3>Work Experience - Current</h3><p id="pv-workCurrent"></p></div>
+      <div class="section"><h3>Work Experience - Previous</h3><p id="pv-workPrev"></p></div>
+      <div class="section"><h3>Education</h3><p id="pv-education"></p></div>
+      <div class="section"><h3>Soft Skills</h3><p id="pv-softSkills"></p></div>
+      <div class="section"><h3>Hobbies</h3><p id="pv-hobby"></p></div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById("toggleDark").addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+});
+
+function saveToLocal() {
+  const fields = ["name","phone","email","address","summary","skills","workCurrent","workPrev","education","softSkills","hobby"];
+  fields.forEach(id => localStorage.setItem(id, document.getElementById(id).value));
+}
+
+function updatePreview() {
+  const get = id => document.getElementById(id).value;
+  document.getElementById("pv-name").textContent = get("name") || "Your Name";
+  document.getElementById("pv-contact").textContent = `${get("phone")} | ${get("email")} | ${get("address")}`;
+  document.getElementById("pv-summary").textContent = get("summary");
+  document.getElementById("pv-skills").textContent = get("skills");
+  document.getElementById("pv-workCurrent").textContent = get("workCurrent");
+  document.getElementById("pv-workPrev").textContent = get("workPrev");
+  document.getElementById("pv-education").textContent = get("education");
+  document.getElementById("pv-softSkills").textContent = get("softSkills");
+  document.getElementById("pv-hobby").textContent = get("hobby");
+
+  const photoInput = document.getElementById("photo").files[0];
+  if (photoInput) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.getElementById("pv-photo");
+      img.src = e.target.result;
+      img.style.display = "block";
+    };
+    reader.readAsDataURL(photoInput);
+  }
+}
+
+// ✅ PDF only 1 page fix
+async function downloadPDF() {
+  const element = document.getElementById("preview");
+  const canvas = await html2canvas(element, { scale: 2 });
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jspdf.jsPDF("p", "mm", "a4");
+  
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  
+  // Auto resize to fit single page
+  const imgWidth = pageWidth - 20;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  const ratio = imgHeight > pageHeight ? pageHeight / imgHeight : 1;
+
+  pdf.addImage(imgData, "PNG", 10, 10, imgWidth * ratio, imgHeight * ratio);
+  pdf.save("Resume.pdf");
+}
+
+window.onload = () => {
+  if (localStorage.getItem("darkMode") === "true") document.body.classList.add("dark");
+};
+</script>
+
+</body>
+</html>
